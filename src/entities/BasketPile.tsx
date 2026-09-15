@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber';
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { BASKET_PILE_MAX, BASKET_Y, CATCH_POP_DURATION_SECONDS, PILE_EGG_HEIGHT, PILE_EGG_WIDTH } from '../config/constants';
 import { useGameStore } from '../state/gameStore';
@@ -53,6 +53,19 @@ export const BasketPile = forwardRef<BasketPileHandle, BasketPileProps>(({ baske
     count.current = 0;
     ages.fill(0);
   }, [runId, ages]);
+
+  // A brand-new InstancedMesh's instanceMatrix is a zero-filled buffer, not
+  // "every instance parked off-screen" — that only happens once useFrame
+  // below actually runs, which it doesn't while status !== 'playing' (and
+  // the Canvas renders on demand outside of play). Parking every instance
+  // explicitly and synchronously on mount closes that gap.
+  useLayoutEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    hideInstances(mesh, dummy, 0, BASKET_PILE_MAX);
+    mesh.instanceMatrix.needsUpdate = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useFrame((_, delta) => {
     const mesh = meshRef.current;

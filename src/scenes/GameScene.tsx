@@ -62,7 +62,7 @@ export function GameScene() {
   return (
     <>
       <ResponsiveCamera />
-      <Background />
+      <Background showImage={status !== 'menu'} />
       <GroundSplats ref={groundSplatsRef} />
       <Basket directionRef={directionRef} basketXRef={basketXRef} />
       <BasketPile ref={basketPileRef} basketXRef={basketXRef} />

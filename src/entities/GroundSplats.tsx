@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber';
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import {
   BROKEN_EGG_HEIGHT,
@@ -78,6 +78,21 @@ export const GroundSplats = forwardRef<GroundSplatsHandle>((_props, ref) => {
       for (const slot of slots) slot.active = false;
     }
   }, [runId, slotsPerVariant]);
+
+  // A brand-new InstancedMesh's instanceMatrix is a zero-filled buffer, not
+  // "every instance parked off-screen" — that only happens once useFrame
+  // below actually runs, which it doesn't while status !== 'playing' (and
+  // the Canvas renders on demand outside of play). Parking every instance
+  // in both pools explicitly and synchronously on mount closes that gap.
+  useLayoutEffect(() => {
+    for (const meshRef of meshRefs) {
+      const mesh = meshRef.current;
+      if (!mesh) continue;
+      hideInstances(mesh, dummy, 0, GROUND_SPLAT_POOL_SIZE);
+      mesh.instanceMatrix.needsUpdate = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useFrame((_, delta) => {
     if (status !== 'playing') return;

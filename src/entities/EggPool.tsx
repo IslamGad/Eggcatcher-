@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber';
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { BASKET_HEIGHT, BASKET_WIDTH, BASKET_Y, CATCH_X_TOLERANCE, EGG_ROTATION_SPEED, GROUND_Y } from '../config/constants';
 import { useGameStore } from '../state/gameStore';
@@ -77,6 +77,23 @@ export const EggPool = forwardRef<EggPoolHandle, EggPoolProps>(
     useEffect(() => {
       for (const slot of slots) slot.active = false;
     }, [runId, slots]);
+
+    // A brand-new InstancedMesh's instanceMatrix is a zero-filled buffer,
+    // not "every instance parked off-screen" — that only happens once
+    // useFrame below actually runs. But useFrame only runs while
+    // status === 'playing', and the Canvas renders on demand outside of
+    // play, so a pool that has never played this session could otherwise
+    // sit through an arbitrary number of idle (menu) frames showing
+    // whatever a raw zero matrix rasterizes as. Parking every instance
+    // explicitly, synchronously on mount, closes that gap regardless of
+    // whether/when a frame happens to run first.
+    useLayoutEffect(() => {
+      const mesh = meshRef.current;
+      if (!mesh) return;
+      hideInstances(mesh, dummy, 0, poolSize);
+      mesh.instanceMatrix.needsUpdate = true;
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useFrame((_, delta) => {
       const mesh = meshRef.current;

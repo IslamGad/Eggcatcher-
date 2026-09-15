@@ -36,10 +36,17 @@ const CHICKEN_FACE_TOP_Y = -6;
 const CHICKEN_FACE_HEIGHT = 215;
 
 // The blink eyelid covers both eyes on the "happy" face specifically (the
-// idle default). Measured directly in that source PNG's own 210x234 pixel
-// space, not the shared 238x263 character canvas.
-export const CHICKEN_HAPPY_FACE_NATIVE_SIZE = { w: 210, h: 234 };
-export const CHICKEN_HAPPY_EYES_RECT_LOCAL: PixelRect = { x: 5, y: 105, w: 100, h: 50 };
+// idle default). Measured directly in that source PNG's own 143x229 pixel
+// space, not the shared 238x263 character canvas. (The source file was
+// trimmed from a 210x234 canvas that had 67px of unused transparent padding
+// on the right and 5px on top — every other expression PNG is already
+// cropped tight to its art with zero padding, and that stray padding was
+// what threw the happy face off-center relative to the body/wings, since
+// faceWorldLayout centers the image's full canvas, not just its drawn
+// content. These numbers are the old rect's x unchanged, y shifted up by
+// the 5px that was trimmed off the top.)
+export const CHICKEN_HAPPY_FACE_NATIVE_SIZE = { w: 143, h: 229 };
+export const CHICKEN_HAPPY_EYES_RECT_LOCAL: PixelRect = { x: 5, y: 100, w: 100, h: 50 };
 
 export interface WorldSpriteLayout {
   width: number;

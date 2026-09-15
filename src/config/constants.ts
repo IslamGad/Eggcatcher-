@@ -3,7 +3,7 @@
 // means the layout scales cleanly from a phone browser to a 4K TV panel.
 export const WORLD_HEIGHT = 10;
 
-export const GAME_DURATION_SECONDS = 5 * 60;
+export const GAME_DURATION_SECONDS = 3 * 60;
 export const EGG_SPAWN_INTERVAL_SECONDS = 2;
 
 export const BASKET_WIDTH = 2.4;
@@ -42,9 +42,9 @@ export const CHICKEN_FLAP_ANGLE_DEGREES = 30;
 
 // Eye blink: a brief, randomly-timed eyelid that covers the (idle/happy)
 // face's eyes. The eyelid is a flat-colored plane, not a cropped art asset —
-// its color is sampled from the cream/feather tone right next to the eyes on
-// each color variant's happy face (see config/chickens.ts's
-// CHICKEN_EYELID_COLORS), so it reads as skin rather than a visible patch.
+// its color matches the same per-variant tint applied to the shared chicken
+// art (see config/chickens.ts's CHICKEN_TINT_COLORS), so it reads as skin
+// rather than a visible patch.
 export const CHICKEN_BLINK_DURATION_SECONDS = 0.14;
 export const CHICKEN_BLINK_MIN_INTERVAL_SECONDS = 2;
 export const CHICKEN_BLINK_MAX_INTERVAL_SECONDS = 5;

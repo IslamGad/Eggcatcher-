@@ -1,6 +1,10 @@
 :root {
   color-scheme: dark;
-  --color-bg: #1a2a1f;
+  /* Matches the Canvas's own clear color (see App.tsx) and the farm
+     background it sits in front of, so the very first paint — before any
+     JS has run, and before textures finish loading — already looks like
+     the game instead of flashing an unrelated dark panel color. */
+  --color-bg: #8ecae6;
   --color-panel: #1f3326f2;
   --color-ink: #fdf6e3;
   --color-ink-muted: #cfe8d2;
@@ -266,6 +270,42 @@ button:focus-visible {
   font-size: 0.85rem;
   line-height: 1.5;
   pointer-events: none;
+}
+
+/* ---------- Loading screen ---------- */
+
+.loading-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  background: var(--color-bg);
+  color: #ffffff;
+}
+
+.loading-screen__spinner {
+  width: clamp(2.5rem, 6vh, 3.5rem);
+  height: clamp(2.5rem, 6vh, 3.5rem);
+  border-radius: 50%;
+  border: 0.35rem solid #ffffff55;
+  border-top-color: #ffffff;
+  animation: loading-screen-spin 0.9s linear infinite;
+}
+
+@keyframes loading-screen-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-screen__label {
+  margin: 0;
+  font-size: clamp(1rem, 2.2vh, 1.3rem);
+  font-weight: 600;
+  text-shadow: 0 0.1rem 0.3rem #00000055;
 }
 
 /* ---------- Accessibility utility ---------- */

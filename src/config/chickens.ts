@@ -2,8 +2,18 @@ import { GAME_DURATION_SECONDS } from './constants';
 
 type ChickenColorVariant = 'default' | 'blue' | 'orange' | 'purple' | 'green';
 
-/** Flat eyelid color per variant, sampled from the cream/feather tone right next to that variant's own happy-face eyes — see entities/Chicken.tsx's blink overlay. */
-export const CHICKEN_EYELID_COLORS: Record<ChickenColorVariant, string> = {
+/**
+ * Per-variant color, applied two ways — both driven by this one map so they
+ * always agree:
+ *  - As a multiply tint on the single shared chicken art (body/wings/faces
+ *    are only ever loaded once, undyed — see entities/Chicken.tsx). This is
+ *    the "recolor via filter instead of shipping 5x the art" piece: one set
+ *    of PNGs on disk, five looks on screen.
+ *  - As the flat fill for the blink eyelid plane, which isn't part of the
+ *    texture so it needs its own color to read as skin over that tint
+ *    rather than a visible patch.
+ */
+export const CHICKEN_TINT_COLORS: Record<ChickenColorVariant, string> = {
   default: '#fcf0d7',
   blue: '#a6cfca',
   orange: '#f5bd84',

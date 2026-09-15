@@ -20,7 +20,7 @@ export function StartMenu() {
         <p className="eyebrow">Farmyard Frenzy</p>
         <h1 id="menu-title">Egg Catcher</h1>
         <p className="subtitle">
-          Catch every egg the chicken drops — but watch out, every 5th one is rotten. You've got 5 minutes, and it only gets faster.
+          Catch every egg the chicken drops — but watch out, every 5th one is rotten. You've got 3 minutes, and it only gets faster.
         </p>
 
         <div className="stat-card">

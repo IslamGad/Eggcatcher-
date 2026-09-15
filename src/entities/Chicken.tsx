@@ -17,7 +17,7 @@ import {
   type WorldSpriteLayout,
 } from '../config/chickenArt';
 import type { ChickenConfig } from '../config/chickens';
-import { CHICKEN_EYELID_COLORS, isChickenActive } from '../config/chickens';
+import { CHICKEN_TINT_COLORS, isChickenActive } from '../config/chickens';
 import {
   ANGRY_DURATION_SECONDS,
   ANGRY_SPEED_MULTIPLIER,
@@ -95,6 +95,14 @@ function pivotedPlaneGeometry(width: number, height: number, localPivot: { x: nu
  * technique already proven for the wing-pose swap this replaced — toggling
  * `.visible` on pre-declared meshes, rather than mutating a shared
  * material's texture at runtime.
+ *
+ * Every chicken — regardless of colorVariant — loads the exact same body,
+ * wing and face textures (one request each, cached and shared across every
+ * instance). The variant's look comes entirely from a per-instance material
+ * `color` multiply tint (config/chickens.ts's CHICKEN_TINT_COLORS), the same
+ * mechanism already used for the angry red flash below, rather than shipping
+ * a full duplicate art set per color. That's 5x fewer image requests and a
+ * much smaller download for the same roster of chickens.
  */
 export function Chicken({ config, index, chickenPositionsRef, elapsedRef, reactionEventRef }: ChickenProps) {
   const bodyMeshRef = useRef<THREE.Mesh>(null);
@@ -118,16 +126,15 @@ export function Chicken({ config, index, chickenPositionsRef, elapsedRef, reacti
     return callbacks;
   }, []);
 
-  const suffix = config.colorVariant === 'default' ? '' : `-${config.colorVariant}`;
-  const bodyTexture = useSpriteTexture(`/sprites/chicken2-body${suffix}.png`);
-  const wingLeftTexture = useSpriteTexture(`/sprites/chicken2-wing-left${suffix}.png`);
-  const wingRightTexture = useSpriteTexture(`/sprites/chicken2-wing-right${suffix}.png`);
-  const happyTexture = useSpriteTexture(`/sprites/chicken2-face-happy${suffix}.png`);
-  const curiousTexture = useSpriteTexture(`/sprites/chicken2-face-curious${suffix}.png`);
-  const surprisedTexture = useSpriteTexture(`/sprites/chicken2-face-surprised${suffix}.png`);
-  const angryTexture = useSpriteTexture(`/sprites/chicken2-face-angry${suffix}.png`);
-  const sadTexture = useSpriteTexture(`/sprites/chicken2-face-sad${suffix}.png`);
-  const determinedTexture = useSpriteTexture(`/sprites/chicken2-face-determined${suffix}.png`);
+  const bodyTexture = useSpriteTexture('/sprites/chicken2-body.png');
+  const wingLeftTexture = useSpriteTexture('/sprites/chicken2-wing-left.png');
+  const wingRightTexture = useSpriteTexture('/sprites/chicken2-wing-right.png');
+  const happyTexture = useSpriteTexture('/sprites/chicken2-face-happy.png');
+  const curiousTexture = useSpriteTexture('/sprites/chicken2-face-curious.png');
+  const surprisedTexture = useSpriteTexture('/sprites/chicken2-face-surprised.png');
+  const angryTexture = useSpriteTexture('/sprites/chicken2-face-angry.png');
+  const sadTexture = useSpriteTexture('/sprites/chicken2-face-sad.png');
+  const determinedTexture = useSpriteTexture('/sprites/chicken2-face-determined.png');
 
   const faceTextures = useMemo<Record<Expression, THREE.Texture>>(
     () => ({
@@ -152,7 +159,7 @@ export function Chicken({ config, index, chickenPositionsRef, elapsedRef, reacti
     () => faceLocalRectToWorldLayout(CHICKEN_HAPPY_EYES_RECT_LOCAL, CHICKEN_HAPPY_FACE_NATIVE_SIZE.w, CHICKEN_HAPPY_FACE_NATIVE_SIZE.h, CHICKEN_WIDTH),
     [],
   );
-  const eyelidColor = CHICKEN_EYELID_COLORS[config.colorVariant];
+  const eyelidColor = CHICKEN_TINT_COLORS[config.colorVariant];
 
   const wingLeftPivotWorld = useMemo(() => pixelPointToWorldOffset(CHICKEN_WING_LEFT_PIVOT, CHICKEN_WIDTH), []);
   const wingRightPivotWorld = useMemo(() => pixelPointToWorldOffset(CHICKEN_WING_RIGHT_PIVOT, CHICKEN_WIDTH), []);
@@ -181,7 +188,10 @@ export function Chicken({ config, index, chickenPositionsRef, elapsedRef, reacti
   const blinkTimerRef = useRef(-1);
   const blinkNextInRef = useRef(randomRange(CHICKEN_BLINK_MIN_INTERVAL_SECONDS, CHICKEN_BLINK_MAX_INTERVAL_SECONDS));
 
-  const whiteColor = useMemo(() => new THREE.Color('#ffffff'), []);
+  // Idle tint: the variant's own color (see CHICKEN_TINT_COLORS) multiplied
+  // over the single shared, undyed art set — this is what makes each color
+  // variant look distinct without loading a separate image per color.
+  const variantColor = useMemo(() => new THREE.Color(CHICKEN_TINT_COLORS[config.colorVariant]), [config.colorVariant]);
   const angryColor = useMemo(() => new THREE.Color(ANGRY_TINT_COLOR), []);
   const tintScratch = useMemo(() => new THREE.Color(), []);
 
@@ -256,7 +266,7 @@ export function Chicken({ config, index, chickenPositionsRef, elapsedRef, reacti
       const fadeOut = Math.min(1, remaining / ANGRY_TINT_TRANSITION_SECONDS);
       tintAmount = Math.max(0, Math.min(fadeIn, fadeOut)) * ANGRY_TINT_MAX_STRENGTH;
     }
-    tintScratch.copy(whiteColor).lerp(angryColor, tintAmount);
+    tintScratch.copy(variantColor).lerp(angryColor, tintAmount);
     (bodyMesh.material as THREE.MeshBasicMaterial).color.copy(tintScratch);
     (wingLeftMesh.material as THREE.MeshBasicMaterial).color.copy(tintScratch);
     (wingRightMesh.material as THREE.MeshBasicMaterial).color.copy(tintScratch);

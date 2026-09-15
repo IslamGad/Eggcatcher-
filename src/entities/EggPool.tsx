@@ -116,8 +116,13 @@ export const EggPool = forwardRef<EggPoolHandle, EggPoolProps>(
       mesh.instanceMatrix.needsUpdate = true;
     });
 
+    // frustumCulled defaults to using the base geometry's bounding sphere at
+    // the mesh's own local origin — it doesn't account for where setMatrixAt
+    // has actually scattered each instance, so THREE can (and, for a
+    // per-instance-transform pool like this one, reliably will) cull the
+    // entire pool as "off camera" even while instances sit in plain view.
     return (
-      <instancedMesh ref={meshRef} args={[undefined, undefined, poolSize]}>
+      <instancedMesh ref={meshRef} frustumCulled={false} args={[undefined, undefined, poolSize]}>
         <planeGeometry args={[width, height]} />
         <meshBasicMaterial map={texture} transparent alphaTest={0.05} />
       </instancedMesh>

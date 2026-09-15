@@ -78,7 +78,11 @@ export const BasketPile = forwardRef<BasketPileHandle, BasketPileProps>(({ baske
   });
 
   return (
-    <instancedMesh ref={meshRef} args={[undefined, undefined, BASKET_PILE_MAX]}>
+    // frustumCulled defaults to using the base geometry's bounding sphere at
+    // the mesh's own local origin, not where setMatrixAt actually scattered
+    // each instance — leaving it on can cull this whole pool as "off
+    // camera" even while instances sit in plain view.
+    <instancedMesh ref={meshRef} frustumCulled={false} args={[undefined, undefined, BASKET_PILE_MAX]}>
       <planeGeometry args={[PILE_EGG_WIDTH, PILE_EGG_HEIGHT]} />
       <meshBasicMaterial map={texture} transparent alphaTest={0.05} />
     </instancedMesh>

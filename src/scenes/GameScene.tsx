@@ -11,6 +11,7 @@ import { EggManager } from '../entities/EggManager';
 import { GroundSplats, type GroundSplatsHandle } from '../entities/GroundSplats';
 import { PerfTracker } from '../entities/PerfTracker';
 import { ResponsiveCamera } from '../entities/ResponsiveCamera';
+import { WebGLRecovery } from '../entities/WebGLRecovery';
 import { useKeyboardControls } from '../hooks/useKeyboardControls';
 import { useGameStore } from '../state/gameStore';
 
@@ -62,6 +63,7 @@ export function GameScene() {
   return (
     <>
       <ResponsiveCamera />
+      <WebGLRecovery />
       <Background showImage={status !== 'menu'} />
       <GroundSplats ref={groundSplatsRef} />
       <Basket directionRef={directionRef} basketXRef={basketXRef} />

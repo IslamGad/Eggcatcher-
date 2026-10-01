@@ -23,7 +23,7 @@ function isFramed(): boolean {
 }
 
 /** Posted to the parent frame when the player asks to exit — see README for the host-side contract. */
-export const CLOSE_MESSAGE_TYPE = 'egg-catcher:close';
+export const CLOSE_MESSAGE_TYPE = 'close-game';
 
 function requestClose() {
   window.parent.postMessage({ type: CLOSE_MESSAGE_TYPE }, '*');

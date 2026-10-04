@@ -15,6 +15,7 @@ export const PRELOAD_TEXTURE_URLS: readonly string[] = [
   '/sprites/egg-rotten.png',
   '/sprites/egg-golden.png',
   '/sprites/egg-broken.png',
+  '/sprites/egg-broken-side.png',
   '/sprites/chicken2-body.png',
   '/sprites/chicken2-wing-left.png',
   '/sprites/chicken2-wing-right.png',
